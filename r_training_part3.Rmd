@@ -1,0 +1,381 @@
+---
+title: |
+  ![](forecast_logo.png){width=3in}  
+  R Programming for Data Analytics - Part 3
+author: "Forecast Data Services"
+output: html_document
+date: '2022-11-15'
+---
+
+```{r include=FALSE}
+library(dplyr)
+melb_data <- readr::read_csv("data/melb_data_edited.csv")
+```
+
+## Module 6 - Coding Standards
+
+#### In this session we will cover:
+
+1.  Why standards are important
+2.  Code formatting
+3.  DRY code
+4.  Documentation
+5.  Version control
+6.  Debugging code
+
+### Coding standards
+
+$~$
+
+#### Why standards are important
+
+While there is no formal way of measuring code, adhering to certain coding standards will help improve your ability to write readable, correct and robust code.
+
+We are going to look at some of the tools/ways in which we can encourage writing of good/clean code.
+
+$~$
+
+#### Code formatting
+
+The [**tidyverse style guide**](https://style.tidyverse.org/) written by Hadley Wickham, is a document that provides guidelines and best practices on how to write R code. 
+
+This set of guidelines is constantly updated as the language develops. The main purpose of the guidelines is to make code more readable and consistent as we will likely spend more time reading code rather than writing it. Some organisations choose to supplement these standards to suit their industry or methods of working.
+
+A few examples of guidelines are:
+
+1)  **Naming conventions**:
+
+-   Variable names should be nouns and functions should be verbs
+-   Variable and function names should use only lowercase letters, numbers, and `_`. Use underscores (`_`) to separate words within a name
+-   Avoid using full stops (`.`) when naming variables and functions as these should be reserved for the S3 object system
+-   If files run in a particular order, prefix the file name with numbers indicating the order.
+
+2)  **Syntax**
+
+-   Be consistent with ,the use of spaces and returns.
+-   Use `<-` for assignment, not `=`
+
+$~$
+
+#### DRY - Don't Repeat Yourself
+
+The general idea of this comes from programming. Always try and avoid duplicating or rewriting the same functionality twice. This reduces the amount of maintenance the code will need going forward.
+
+Where possible abstract the code to avoid redundant code and maintenance issues that may come up over time. This is what is known as the **DRY principle**.
+
+$~$
+
+#### Documentation
+
+As a general principle across any kind of language - good code is both self-explanatory but also well-documented. In general, documentation should be able to explain **what the code is supposed to do (rather than why)**.
+
+Documentation can be produced separately, but for readability and usability comments within code can be useful.
+
+Best practice is to use comments above and inline the code block of interest. We can look back to Module 5 - Data Visualisations to see this in practice.
+
+$~$
+
+#### Version control
+
+Version control is a system used to track historical version of files. This exists across any kind of programming language.
+
+The main reasons for using version control are:
+
+-   Your code won't be static. You will make changes, update, improve, remove old code, etc. The old way of saving \_v2, v3, etc. becomes a nightmare with many files and changes.
+-   If you make a mistake in your code - it's easy to revert back to previous versions (you don't overwrite the code)
+-   Many times you will be sharing code, collaborating - which means having a centralised system to keep all the code will enable that seamless collaboration.
+-   You can access the code from any computer/location - as it sits within a secure server.
+
+There are several options for using version control - the most widely used software is GIT. GIT was the original version control created in 2005 to host your versions of files locally.
+
+$~$
+
+#### Debugging code
+
+Debugging can be useful when: 
+
+- your code has an error and breaks 
+- your code runs but is not producing what you expect 
+- you want to find out what is going on in your code.
+
+There are a number of ways to debug and they vary depending on the level of complexity. We'll give you a few tips for debugging code and point you towards more advanced options we won't cover here.
+
+$~$
+
+##### 1) Use the print() statement
+
+Printing all the objects as you step through your code helps to pinpoint where the issue exists.
+
+$~$
+
+##### 2) Skim and scan error messages to find any reason why code may be failing
+
+Errors tend to be very useful in R, they will point you to the where the issue exists and what kind of error occurred.
+
+$~$
+
+##### 3) Google and stackoverflow are your friends
+
+It is very difficult to know all the error messages and what they mean (they can be cryptic at times). Googling the error will likely lead you to the very useful resource, stackoverflow.com.
+
+It's very likely that someone else has had the same issue as you and there is a very active community that helps and provides solutions. Googling is definitely an active part in learning R.
+
+$~$
+
+More detailed steps for debugging can be found [here](https://adv-r.hadley.nz/debugging.html)
+
+------------------------------------------------------------------------
+
+## Module 7 - Reproducible code (Writing functions)
+
+#### In this session we will cover:
+
+1.  Why we use functions
+2.  Basic control flow (if/else, for loops)
+3.  Saving functions
+4.  Best practices for writing functions
+
+### Writing functions
+
+$~$
+
+#### Why we use functions
+
+Functions enable you to break large programs into smaller, simpler pieces with names to represent their intent. They improve readability and make code more approachable.
+
+They also allow for reuse of code blocks. In Module 6 we spoke about DRY code, and the benefits of reusing code blocks. Functions allow us to put this principle into practice.
+
+*Quick Tip*: Accessing help for each of the functions - With Question Mark (?)
+
+$~$
+
+##### What defines a function
+
+To start, define your function `my_function` and the input parameter(s) that the user will feed into the function. After this you need to define the operation you want to program in the body of the function with curly braces (`{}`) and assign the result/output of the function in a return statement.
+
+```{r eval=FALSE, include=TRUE}
+my_function <- function(input_parameter){
+  statement = input_parameter
+  return(statement)
+}
+```
+
+For example, lets create a function that converts temperature from Fahrenheit to Celsius:
+
+```{r}
+fahrenheit_to_celsius <- function(temp_F) {
+  temp_C <- (temp_F - 32) * 5 / 9
+  return(temp_C)
+}
+temp = 400
+
+print(paste0(temp, " degrees fahrenheit is ", round(fahrenheit_to_celsius(temp), 2), 
+" degrees celsius."))
+```
+
+$~$
+
+#### Basic control flow
+
+A program's control flow is the order in which the program's code executes. The control flow of a R program is regulated by conditional statements, loops, and function calls.
+
+##### The if statement
+
+Often, you need to execute some statements only **if** some condition holds, or choose statements to execute depending on several mutually exclusive conditions. The R compound statement `if`, which uses `if`, `else if`, and `else` clauses, lets you conditionally execute blocks of statements.
+
+The `else if` and `else` clauses are optional.
+
+```{r eval=FALSE, include=TRUE}
+if (test_expression1) {
+  statement1
+} else if (test_expression2) {
+  statement2
+} else {
+  statement3
+}
+```
+
+$~$
+
+##### The while statement
+
+The **while** statement in R supports repeated execution of a statement or block of statements that is controlled by a conditional expression. Here's the syntax for the while statement:
+
+```{r eval = FALSE, include = TRUE}
+while (test_expression){
+  statement
+}
+```
+
+An example would be;
+
+```{r}
+x = 12345
+count = 0
+
+while (x > 0){
+  x = x %/% 2           
+  count = count + 1
+}
+print(paste0("The approximate of log2 is ", count))
+```
+
+First, the expression, which is known as the loop condition, is evaluated. If the loop condition is satisfied, the statement or statements that comprise the loop body are executed. When the loop body finishes executing, the loop condition is evaluated again, to see if another iteration should be performed. This process continues until the loop condition is false, at which point the while statement ends.
+
+The loop body should contain code that eventually makes the loop condition false, or the loop will never end unless an exception is raised or the loop body executes a break statement.
+
+$~$
+
+##### The for statement
+
+The **for** statement supports repeated execution of a statement or block of statements that is controlled by an iterable expression. The syntax is:
+
+```{r eval=FALSE, include=TRUE}
+for (i in sequence) {
+  statement
+}
+```
+
+The statement or statements that comprise the loop body execute once for each item in iterable. See example:
+
+```{r}
+my_vec <- letters[10:14] 
+for (i in my_vec){
+    print(paste0("give me a ", i, "..."))
+}
+```
+
+$~$
+
+##### Using control flow to minimise user error
+
+We can combine control flow with our custom functions to minimise any unintentional misuse.
+
+If we look again at the example of a custom function, we can see that a user could enter any numeric value to the function. This could lead to some unlikely results for temperature.
+
+```{r}
+fahrenheit_to_celsius <- function(temp_F) {
+  temp_C <- (temp_F - 32) * 5 / 9
+  return(temp_C)
+}
+temp = 1000000 #1 million degrees Fahrenheit is an unlikely value in the known universe.
+
+print(paste0(temp, " degrees fahrenheit is ", round(fahrenheit_to_celsius(temp), 2), 
+" degrees celsius."))
+```
+
+On Earth, it is highly unlikely that the temperature will reach outside the realm of -150 and 150 degrees Fahrenheit. We can therefore use an if statement to flag potential user error of the function.
+
+```{r}
+fahrenheit_to_celsius <- function(temp_F) {
+  if (temp_F < -150 | temp_F > 150){
+    print("Given temperature in Fahrenheit outside expected range. Please review.")
+  } else {
+    temp_C <- (temp_F - 32) * 5 / 9
+  return(temp_C)
+  }
+  
+}
+temp = 1000000 #1 million degrees Fahrenheit is an unlikely value in the known universe.
+
+fahrenheit_to_celsius(temp)
+```
+
+$~$
+
+#### Saving functions in R scripts ('modules') and importing them as .R
+
+Functions are useful because they allow us to reuse code over and over.
+
+The way we would normally go about this is by having all the functions written in a separate `.R` file (which is effectively a text file but written in R code).
+
+Then, at the start of a script/markdown, the same way we import packages, we can import those functions into our workspace.
+
+`source(scriptname.R)`
+
+Then, all the functions can be referenced in your script/markdown, the same way we would do it for packaged libraries.
+
+$~$
+
+##### Example of writing a function for our demo dataset
+
+Lets try an example of writing a function for our demo Melbourne data set.
+
+We want to create a new column to tell us whether each of the houses in the suburb is higher or lower than the total average price for houses in that suburb for a given year.
+
+```{r}
+create_above_below_avg_flag <- function(df, year_val, suburb_val){
+  # Filter dataset based on user input
+  df_flagged = df %>%
+    dplyr::filter(
+      Year == year_val,
+      Suburb == suburb_val
+      ) %>%
+    dplyr::mutate(
+      above_below_avg_price = 
+        if_else(Price < mean(Price),'above_avg','below_avg')
+      )
+  
+  print(paste0("Average house price in ", suburb_val, " for ",
+               year_val, " is $", mean(df_flagged$Price)))
+  
+  return(df_flagged)
+}
+
+housing_data_suburb_year = create_above_below_avg_flag(melb_data, '2017', 'Abbotsford')
+```
+
+##### How could we make the above function better?
+
+We could make sure that everything is defined within a function to make it more iterable and generic so it can be used in other occasions. Have a go at trying this yourself!
+
+$~$
+
+#### Best Practices for writing functions
+
+-   Each function should do only 1 thing (better to have a few small functions than a long one)
+-   Name your function in a descriptive way as to what it's going to do
+-   Avoid unpronounceable names
+-   Avoid using names that shadow existing functions or variable (e.g. don't call a function list, use 'id_list' instead)
+-   Function names should be verbs
+
+------------------------------------------------------------------------
+
+### Exercises - Module 7
+
+$~$
+
+#### 1) Create a simple function
+
+-   Convert property prices from dollars to pounds. *(Tip: Check the mean price of property prices before and after you use your function to check that it has worked)*
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+$~$
+
+#### 2) Place control flows in your function to prevent function failing or returning a nonsensical answer.
+
+-   Ensure the variable passed into the function exists in the dataset given.
+-   Ensure the rate is within realistic bounds.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

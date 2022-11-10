@@ -1,0 +1,265 @@
+---
+title: |
+  ![](forecast_logo.png){width=3in}  
+  R Programming for Data Analytics - Part 2
+author: "Forecast Data Services"
+output: html_document
+date: '2022-11-15'
+runtime: shiny
+---
+
+```{r message=FALSE, warning=FALSE}
+# Packages needed
+library(ggplot2)
+library(readr)
+library(dplyr)
+library(shiny)
+```
+
+## Module 5 - Data Visualisations
+
+#### In this session we will cover:
+
+1.  Visualisations using base R
+2.  Advanced plotting with ggplot
+3.  Brief introduction to R Shiny
+
+$~$
+
+### Data visualisations
+
+We will be continue using the Melbourne real estate dataset from the previous Modules.
+
+```{r message=FALSE, warning=FALSE}
+melb_data <- readr::read_csv("data/melb_data_edited.csv")
+```
+
+Before getting started with visualisations we are going to just extract the columns we are interested in and create some additional columns.
+
+```{r include=FALSE}
+melb_cleaned_data <- melb_data %>%
+  dplyr::select(-c(Lattitude, Longtitude, YearBuilt, Postcode, BuildingArea, 
+                   Landsize, CouncilArea, Seller, Method)) %>%
+  dplyr::mutate(Year = format(Date, format = "%Y"),
+                Price_thousand = Price/1000,
+                Type = recode(Type, h = "house,cottage,villa,semi,terrace",
+                                   u = "unit,duplex",
+                                   t = "townhouse")) %>%
+  # keeping only latest sale of property
+  dplyr::group_by(Address, Suburb, Regionname) %>%
+  dplyr::filter(Date == max(Date)) 
+  
+summary(melb_cleaned_data)
+
+```
+
+Now lets go on to do some plotting.
+
+$~$
+
+#### Visualisations using base R
+
+**Base R** has some basic plotting functionality, as you will see. However, it is quite limited in terms of what it can do. The current standard is to use the **ggplot2** library, which provides beautiful visuals. The base R plot features can be called with
+
+-   **Scatter**: `plot()`
+-   **Line**: `plot()` with `type = 'l'`
+-   **Histogram**: `hist()`
+-   **Boxplot**: `boxplot()` - when have 2 categories
+
+```{r}
+# Basic Scatter Plot
+plot(x = melb_cleaned_data$Distance, y = melb_cleaned_data$Price_thousand, 
+     xlab = 'Distance from city center', ylab = 'Price (thousands)',
+     main = 'Property price against distance from city center')
+
+# Boxplot
+plot(x = as.factor(melb_cleaned_data$Rooms), y = melb_cleaned_data$Price_thousand, 
+     xlab = 'Number of Rooms', ylab = 'Price (thousands)')
+ 
+# Histogram
+hist(x = melb_cleaned_data$Price_thousand, xlab = 'House price (thousands)', 
+     main = 'Histogram of House prices (in thousands)')
+
+```
+
+$~$
+
+#### Advanced plotting with ggplot
+
+The basic pattern of a ggplot function looks like this:
+
+```{r eval=FALSE, include=TRUE}
+## ggplot blueprint to making any plot
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
+Any ggplot function needs to contain the data to be plotted and how the data should be mapped to the coordinate system (defined by `aes()`).
+
+Ggplot works with layers, and each layer is added with the `'+'` operator.
+
+$~$
+
+##### Scatterplot
+
+Lets try it with our house dataset. We will first plot the same scatterplot as above, but with ggplot.
+
+```{r}
+ggplot(data = melb_cleaned_data) +
+  geom_point(aes(x = Distance, y = Price_thousand))
+```
+
+Theres lots of things we can do with ggplot. For example, we could set the colour of the points to be determined by the year a house was sold.
+
+$~$
+
+##### Scatterplot with colour
+
+```{r}
+ggplot(data = melb_cleaned_data) +
+  geom_point(aes(x = Distance, y = Price_thousand, colour = Year)) 
+```
+
+As we only have 2 years of data, the years are treated as a categorical variable and each year is assigned a unique colour. If we had a continuous variable, a colour scale would be assigned (e.g. light to dark blue).
+
+$~$
+
+##### Scatterplot for average price by region
+
+Lets see if we can find the average price per suburb relative to the number of houses in the suburb.
+
+```{r message=FALSE, warning=FALSE}
+melb_price_suburb = melb_cleaned_data %>%
+  dplyr::group_by(Suburb, Propertycount, Regionname) %>%
+  dplyr::summarise(Avg_Price_thousand = mean(Price_thousand)) 
+  
+ggplot(data = melb_price_suburb) +
+  geom_point(aes(x = Propertycount, y = Avg_Price_thousand, colour = Regionname))
+```
+
+From this, we can see that a lot of suburbs in Southern Metropolitan appear to be quite expensive. Let's get a clearer look of this, by examining the average property price per region against the number of properties sold in the region.
+
+```{r}
+melb_price_region = melb_cleaned_data %>%
+  dplyr::group_by(Regionname) %>%
+  dplyr::summarise(Avg_Price_thousand = mean(Price_thousand), Count = n()) 
+  
+ggplot(data = melb_price_region) +
+  geom_point(aes(x = Count, y = Avg_Price_thousand, colour = Regionname))
+```
+
+From the above graph, we see that the most properties were sold in Southern Metropolitan and on average these were also the most expensive.
+
+$~$
+
+##### Barplot
+
+What about looking at the number of properties sold in each region according to their type?
+
+What do you think is wrong with this graph?
+
+```{r}
+ggplot(data = melb_cleaned_data, aes(x = Regionname, fill = Type)) +
+  geom_bar(colour = 'black') 
+```
+
+Firstly, the names on the x-axis are all on top of each other, making it very difficult to distinguish between the different regions, we can change this using `theme` in ggplot and specifying the angle of the x axis text.
+
+In addition, by default bars are "stacked" on top of each other. This makes comparing proportions rather difficult. You can control this with the position argument.
+
+```{r}
+ggplot(data = melb_cleaned_data, aes(x = Regionname, fill = Type)) +
+  geom_bar(colour = 'black', position = 'dodge') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 1))
+```
+
+From the above graph, we see that most properties sold are 'houses' and that the most 'house' sales happened in Northern and Southern Metropolitan over 2016-2017. Southern Metropolitan also had the most number of 'duplex' sold.
+
+$~$
+
+##### Facet plots
+
+Facets are a useful way to separate out variables into subplots.
+
+There are two ways of doing this; `facet_wrap()` or `facet_grid()`. The main argument here is an R 'formula', where the faceted variable is preceded by a tilde \~ (e.g. `~class`). If we want to look at our property prices according to distance, split by region and property type,
+
+```{r}
+ggplot(data = melb_cleaned_data, aes(x = Distance, y = Price_thousand, colour = Type)) +
+  geom_point() +
+  facet_wrap(~ Regionname, nrow = 3) +
+  theme(legend.position = 'bottom')
+  
+```
+
+$~$
+
+------------------------------------------------------------------------
+
+#### Brief introduction to R Shiny
+
+The Shiny package builds interactive web apps powered by R. In order to call Shiny code from a markdown document, just add `runtime: shiny`. Lets use the Melbourne data we previously cleaned to make a simple R Shiny app.
+
+An R shiny app consists of a UI and Server. The UI (User Interface) contains the different parts of the application's frontend (that is, what the end users see). The Server is the backend or the engine of the application, that is, where the data is processed.
+
+##### A basic R shiny app to let you select price in a specific region
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+ui <- fluidPage(
+  title = 'A basic R shiny example',
+  selectInput("region_select", "Choose a Region to look at",
+              choices = c("Northern Metropolitan", "Western Metropolitan", 
+                          "Southern Metropolitan", "Eastern Metropolitan", 
+                          "South-Eastern Metropolitan", "Eastern Victoria",
+                          "Northern Victoria", "Western Victoria")),
+              # Best practice! set choices = unique(melb_cleaned_data$Regionname)
+    
+  plotOutput("houseprice_plot")
+)
+
+server = function(input, output, session) {
+  # Create Region filter
+  RegionFilter <- reactive({
+    melb_cleaned_data %>% 
+      dplyr::filter(Regionname %in% input$region_select) 
+  })
+  p <- reactive({
+    ggplot(data = RegionFilter(), aes(y = Distance, x = Price_thousand)) +
+      geom_point(aes(color = Type)) +
+      scale_y_continuous(name = "Distance from City Centre") +
+      scale_x_continuous(name = "Price (in thousands)") 
+  })
+  
+  # Plot diagram
+  output$houseprice_plot <- renderPlot({
+    p()
+  })
+ 
+}
+shinyApp(ui, server)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. We will come back to this in more detail later.
+
+------------------------------------------------------------------------
+
+$~$
+
+### Exercises - Module 5 
+
+#### 1) Create a histogram using the Melbourne dataset on the distance from city center. Use either base r or ggplot.
+
+```{r}
+
+```
+
+-   Change the colour (use any colour except the default grey)
+-   (Extra) Add a chart title
+-   (Extra) Add x and y-axis labels
+
+```{r}
+```
+
+```{r message=FALSE, warning=FALSE}
+
+```

@@ -1,0 +1,735 @@
+---
+title: |
+  ![](forecast_logo.png){width=3in}  
+  R Programming for Data Analytics - Part 1
+author: "Forecast Data Services"
+output: html_document
+date: '2022-11-15'
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Module 1 - Introduction to R
+
+#### In this session we will cover:
+
+1.  Introducing concepts
+2.  Writing R code
+3.  Running your code
+4.  Setting up a working directory
+5.  Importing packages
+6.  Use cases/benefits of using R
+7.  Additional resources - R vs SAS terminology
+
+### Introduction to R
+
+#### Introducing concepts
+
+R is one of the most widely used softwares in data science. Several
+interfaces for R have been developed and these are referred to as
+integrated development environments (IDE), which allow for software
+development. We will use the RStudio IDE as it is widely used in the
+community and makes learning to use R a bit simpler.
+
+$~$
+
+#### Writing R code
+
+While you can type and re-type commands in the R Console, it is easier
+and more effective to write the commands in a **R script** file, which
+can then be run. **R markdown** (free and open source) allows you to
+easily create dynamic documents, presentations and reports from R. It
+combines markdown (simple formatting syntax) and embedded R code chunks
+that are run. You can install the R markdown package from CRAN with:
+
+```{r echo=TRUE, eval = FALSE}
+install.packages("rmarkdown")
+```
+
+We will come back to creating an R markdown file and what it entails.
+**R Notebook** is similar to R markdown, but used more as a notebook for
+yourself. When viewing a notebook preview, it doesn't execute any of
+your R code chunks.
+
+R has 2 widely used methods of assignment:
+
+-   the left arrow (`<-`)
+-   the equals sign (`=`)
+
+A `#` is the comment character in R and so anything following this
+character is ignored. We will start by giving an example of running an R
+code block.
+
+$~$
+
+#### Running your code
+
+You can run your R code by either highlighting the area and pressing
+**'Ctrl + Enter'**, running the whole code 'block' by clicking on the
+little **arrow** or selecting **'Run'** at the top of your R script.
+
+```{r running_code, echo=TRUE, eval = FALSE}
+# Assigning a variable
+y <- 20
+
+# Multiplying variable by 76
+answer = y * 76
+
+# Obtaining answer to variable
+paste0("The answer of ", y, " x 76 is ", answer)
+```
+
+$~$
+
+#### Setting up a working directory
+
+For the handling of files, RStudio uses a working directory, which is a
+folder where RStudio reads and saves files. Before we start writing any
+code we should set up a working directory so that everything we want to
+import/export is saved by default in this folder.
+
+```{r setting_wd, echo=TRUE, eval = FALSE}
+# To check what your current wd is
+getwd()
+
+# To change wd
+setwd("...")
+
+# OR Session > Set Working Directory > Choose Directory 
+```
+
+$~$
+
+#### Importing packages
+
+There are many ways of doing the same thing in R. Some are
+(computationally) faster, some are simpler to program or may just be
+more applicable to your personal preference. Packages are a set of
+functions and files that relate to a specific toolset, which extend the
+functionality provided by R. For example, a very popular package
+**tidyverse** (umbrella package which contains **dplyr**) is recommended
+for data manipulation and will be used throughout this course. You can
+install packages using the commands below or by going to the
+**'Packages'** tab followed by **'Install'** in RStudio.
+
+```{r import_packages, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+# Install package
+install.packages("tidyverse")
+
+# To load package 
+library(tidyverse)
+
+# To learn more about a package 
+?dplyr
+```
+
+```{r include=FALSE}
+library(tidyverse)
+```
+
+Once a package is installed you should be able to see it in the packages
+tab.
+
+$~$
+
+#### Additional resources
+
+##### R vs SAS terminology
+
+If you have used SAS before, but not R, here are some suggested
+resources.
+
+<https://github.com/asnr/sas-to-r>
+
+<https://github.com/brendanjodowd/SAS-R>
+
+<https://github.com/jealie/SAS-for-R-programmers>
+
+------------------------------------------------------------------------
+
+## Module 2 - Publication Ready Reproducible Analysis
+
+#### In this session we will cover:
+
+1.  Working with R markdown
+2.  Outputs of R markdown
+
+### Publication Ready Reproducible Analysis
+
+#### Working with R markdown
+
+So just to recap, R markdown is a file format for making dynamic
+documents with R. Markdown is a simple formatting syntax which can be
+used to create HTML, PDF and Word documents.\
+What we have been working on is an R markdown document, and as you can
+see we can incorporate plain text format and chunks of code into it.
+
+$~$
+
+Markdown is a set of conventions for formatting plain text. You can use
+markdown to indicate
+
+-   **Bold** and *italic* text (using two asterisks surrounding text to
+    make it bold \*\*TEXT\*\* or using one asterisks for italicized text
+    \*TEXT\*)
+
+-   lists (group lines into bullet points that begin with an
+    asterisks/hyphen/number and leave a black space before your first
+    item in the list)
+
+-   headers (place one or more hashtags (\#) at the start of a line that
+    will be a header (or sub-header).
+
+    -   a single hashtag creates a first level header
+    -   two hashtags create a second level header etc..
+
+-   hyperlinks (Surround links with brackets, and then provide the link
+    target in parentheses, like this [R Markdown
+    information](http://rmarkdown.rstudio.com))
+
+A useful markdown [cheat
+sheet](https://github.com/rstudio/cheatsheets/raw/main/rmarkdown-2.0.pdf).
+
+$~$
+
+Now that we've covered how to add text in markdown, lets look at how
+chunks of code work. When creating a new chunk of R code we need to
+encapsulate it as follows:
+
+\`\`\`{r}
+
+print('text')
+
+\`\`\`
+
+which will render;
+
+```{r}
+print('text')
+```
+
+Within markdown, you can give your code blocks different names, to
+easily identify which code block you are referring to or, which code
+block is creating an error. You can also
+
+-   change the figure width,
+-   show code and output,
+-   only show output (no code),
+-   only show code (no output),
+-   show nothing, but run code
+-   show warning messages/loading messages
+
+$~$
+
+For example, if you set `echo = FALSE`, this prevents the code but not
+the results from appearing in the finished file, which is a useful way
+to embed figures.
+
+```{r codeblock_example, eval=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+# {r code_block_descriptions, echo = TRUE, fig.width = 14} 
+# fig.width = changes figure width (arbitrary is 7) 
+
+# eval = TRUE (controls whether to execute a code chunk) 
+# echo = TRUE (only get output/ not code)
+
+# error = FALSE, R markdown will halt in code chunk and error displayed in R console
+# message = FALSE (suppress messages appearing in finished doc)
+# warning = FALSE (suppress messages appearing in finished doc)
+```
+
+$~$
+
+#### Outputs of R markdown
+
+When you click the **'Knit'** button, a document will be generated that
+includes both content as well as the output of any embedded R code
+chunks within the document. Depending on how you have specified the
+`output` parameter at the top of the document, will determine whether
+your markdown file should render as an HTML, PDF or Word document.
+
+------------------------------------------------------------------------
+
+## Module 3 - Getting data into/out of R
+
+#### In this session we will cover:
+
+1.  The dataframe as the basis of analysis
+2.  Reading data from csv, excel and Rda files
+3.  Viewing data in R
+4.  Indexing
+5.  Setting column names and types
+6.  Saving data
+
+We will be using a variation of the Melbourne Property prices dataset,
+which can be found
+[here](https://www.kaggle.com/datasets/dansbecker/melbourne-housing-snapshot?resource=download)
+on Kaggle. This dataset includes house prices, number of bedrooms, the
+area, date it was sold and how it was sold.
+
+### Getting data into/out of R
+
+#### The data frame as the basis of analysis
+
+In R, a dataframe (df) is a list of equal length vectors where each
+vector is a column and represents a variable. It is the most common way
+of storing data and used to store data tables.
+
+$~$
+
+#### Reading data from csv, excel and Rda files
+
+Although you can create your own dataframes in R, it will be common for
+you to read in data from a csv (or other) files. To do this, we can use
+the `read_csv()` to load a csv data file. We would assign the result of
+our `read_csv()` to an object. For example;
+
+`dataset = readr::read_csv(filepath_to_your_csv)`
+
+$~$
+
+We can also use the `read_excel()` function to load xls and xlsx files.
+
+`dataset = readxl::read_excel(filepath_to_your_xls)`
+
+$~$
+
+An R data file, just needs to be loaded using the `load()` command.
+
+The code used here assumes that the files are in your working directory.
+If this is not the case, you will need to include the file path.
+
+```{r read_data, message=FALSE, warning=FALSE}
+# To load package (have tidyverse installed)
+library(readr)
+melb_data_csv <- readr::read_csv("data/melb_data.csv")
+
+library(readxl)
+melb_data_excel <- readxl::read_excel("data/melb_data.xlsx")
+
+# Creating a new df to do work on
+melb_data <- melb_data_csv
+
+# To load an Rda file
+load("data/melb_data.Rda")
+```
+
+$~$
+
+#### Viewing data in R
+
+Your data set can be viewed in a number of different ways. Some of these
+are given below.
+
+```{r view_data, , echo=TRUE, eval = FALSE}
+# To view the df
+View(melb_data)
+
+# Obtain a summary of the df meta-data (more detailed)
+str(melb_data)
+
+# Useful details and information about each column in df
+summary(melb_data)
+
+# Get first few rows of df
+head(melb_data)
+```
+
+$~$
+
+#### Indexing
+
+An index is like an address, that's how any data point across the
+dataframe can be accessed. Square brackets (`[ ]`) can be used to subset
+the data.
+
+For e.g. `melb_data[i, j]` would return the value in the ith row and jth
+column of the melb_data dataframe.
+
+You can also find the first 3 variables for say the 100th observation
+and use the colon operator to create a sequence.
+
+```{r , echo=TRUE, eval = FALSE}
+# Column information for 100th row in 2nd column
+melb_data[100, 2]
+
+# Second variable for the 100th and 102th obs, can concatenate c()
+melb_data[c(100, 102), 2]
+
+# First 3 variables for the 100th obs - retrieve 1st to 3rd variable
+melb_data[100, 1:3]
+melb_data['Address']
+
+# To view a specific variable 
+melb_data$Price
+
+```
+
+$~$
+
+#### Setting column names and types
+
+All variables have an associated class and the class helps determine
+which calculations are possible and how these can be performed by R. The
+different class types that exist include;
+
+-   **logical** = TRUE/FALSE
+-   **double** = numeric (all values are double, incl decimal value)
+-   **integer** = numeric
+-   **character**
+-   **factor**
+
+You can check what whether a variable is of the type you specified by,
+for example, saying; `is.logical()`, `is.character()`, `is.integer()` or
+`is.numeric()`.
+
+These all return `TRUE` or `FALSE`. Alternatively if you don't have any
+idea as to what the variable class could be, you can identify the type
+of column using `typeof()` or `class`. Our dataset currently has 2
+different classes: **numeric** and **character**.
+
+```{r, echo=TRUE, eval = FALSE}
+# Class Information for individual column
+class(melb_data$Date)
+
+# Class Information for whole dataframe
+sapply(melb_data, class)
+```
+
+We can change the class type of a column. For example, from the
+information, we see that the class type of the *'Date'* variable is
+**character**. We can change it to be of class **date**, using the
+following code;
+
+```{r, echo=TRUE, eval = FALSE}
+# Change class type
+melb_data$Date = as.Date(melb_data$Date, format = "%d/%m/%Y")
+
+# Checking class type has changed
+sapply(melb_data, class)
+```
+
+If we had variables which were recognised as being integers, but we
+wanted them to be categorical, we could do the
+following;
+
+```{r, echo=TRUE, eval = FALSE}
+melb_data$Type = as.factor(melb_data$Type)
+levels(melb_data$Type)
+```
+
+We can also change the column names, using `colnames()`.
+
+```{r, echo=TRUE, eval = FALSE}
+# Setting column names
+colnames(melb_data)[6] <- "Bedroom"
+```
+
+$~$
+
+#### Saving data
+
+Say you have done any changes you want to and are now wanting to save
+your data. You can save it as a csv, excel or Rda file. This can be done
+by using `write.csv()` and `write.xlsx()`. Bear in mind the argument
+`row.names` is by default set to `TRUE` (and means it will add the row
+names as a column to your data) and that columns are separated by a
+comma. If you do not want to export row headers, set this condition to
+`FALSE`.
+
+```{r message=TRUE, warning=TRUE, echo=TRUE, eval = FALSE}
+# Save as csv
+write.csv(melb_data, "data/melb_data_edited.csv", row.names = FALSE)
+
+# Save as xlsx
+library("writexl")
+writexl::write_xlsx(melb_data, "data/melb_data_edited.xlsx")
+
+# Save as Rda
+save(melb_data, file = "data/melb_data_edited.Rda")
+```
+
+$~$
+
+------------------------------------------------------------------------
+
+### Exercises - Module 3
+
+$~$
+
+#### 1) SellerG appears to be a numeric variable - convert it to a categorical variable
+
+```{r}
+
+```
+
+$~$
+
+#### 2) Rename the column SellerG to Seller.
+
+```{r}
+
+```
+
+$~$
+
+#### 3) Which Seller has sold the most properties overall?
+
+```{r}
+
+```
+
+$~$
+
+#### 4) What is the lowest and highest price a property has been sold for?
+
+```{r}
+
+```
+
+------------------------------------------------------------------------
+
+## Module 4 - Data Manipulation
+
+#### In this session we will cover:
+
+1.  Difference between base R and dplyr
+2.  Filtering and subsetting
+3.  Grouping and summarising data
+
+### Data Manipulation
+
+#### Difference between base R and dplyr
+
+We will look
+at the differences between **base R** and **dplyr** before going on to
+apply both of these methods to some of the data.
+
+**Base R** is the basic software which contains the R programming
+language and all the basic functions.
+
+**Dplyr** is an R-package to transform and summarise tabular data and
+provides easy tools to do this.
+
+$~$
+
+#### Filtering and subsetting
+
+Usually we are interested in doing analysis or finding out information
+about a subset of our data. First we will be working with filtering and
+selecting.
+
+Often you will see people use the pipe operator (`%>%`) - this is a
+feature of tidyverse. Here the data is 'piped' into a command. For
+example, if you wanted to extract certain column(s) from your dataframe,
+you could do the following:
+
+```{r data_subset, echo=TRUE, eval = FALSE}
+# Select Address column
+# dplyr
+melb_data %>% dplyr::select(Address)
+
+# base R
+subset(melb_data, select = c(Address))
+
+# Select all columns except Address column
+# dplyr
+melb_data %>% dplyr::select(-c(YearBuilt))
+
+# base R
+subset(melb_data, select = -c(YearBuilt))
+```
+
+Notice how you don't need to specify the dataset in the select command
+with dplyr. This is because R interprets the dataframe (`melb_data`) as
+being the first argument (and the one to perform operations on).
+
+The pipe operator can make code more readable by allowing us to connect
+multiple functions so you don't need to reference your dataframe each
+time you run a command or use a nested function (function within another
+function).
+
+```{r, echo=TRUE, eval = FALSE}
+# Filter data to only have houses priced under 1mill in Albert Park with at least 2 bedrooms
+# dplyr
+melb_data %>% 
+  dplyr::filter(Price < 1000000,
+                Bedroom >= 2,
+                Suburb == 'Albert Park') 
+
+# base r
+melb_data[melb_data$Price < 1000000 & 
+            melb_data$Bedroom >= 2 & 
+            melb_data$Suburb == 'Albert Park', ]
+```
+
+You can see some more of the differences between using base R and dplyr
+[here](https://cran.r-project.org/web/packages/dplyr/vignettes/base.html).
+Going forward, we will use dplyr, as it is commonly used in industry.
+
+$~$
+
+#### Grouping and summarising data
+
+Grouped operations are a powerful way to aggregate, transform, and
+filter data. They rely on the mantra of **"split-apply-combine"**:
+
+1.  Data is split into separate parts based on groups
+2.  A function is applied to each part of the data
+3.  The results from each part are combined to create a new data set.
+
+This is a powerful concept because parts of your original data can be
+split up into independent parts to perform a calculation. We can create
+summary statistics and breakdown the data using commands from the dplyr
+package;
+
+-   `group_by()`: *which variables we want to produce breakdowns by*
+-   `summarise()`: *indicate which values to calculate*
+
+Using the above functions we can produce summary statistics in a similar
+way to pivot tables in Excel. So let's get the average house price with
+breakdown by Suburb. Here R takes the `melb_dataset` and groups it by
+*Suburb* and outputs the average house price by Suburb. The mean price
+variable created has been called *'Average_Price_Suburb'* and the
+results are saved into a new dataset called *'suburb_price_avg'*. Here
+we could have also used `min()`, `max()`, `median()` or `n()` instead of
+`mean()`.
+
+```{r , echo=TRUE, eval = FALSE}
+suburb_price_avg = melb_data %>% 
+  dplyr::group_by(Suburb) %>%
+  dplyr::summarise(Average_Price_Suburb = mean(Price))
+```
+
+Let's add a new variable called *'Count'* which provides the counts of
+Houses in Melbourne by the Suburb. We then extract the most expensive
+Suburbs, together with the number of Properties in that Suburb.
+
+```{r , echo=TRUE, eval = FALSE}
+suburb_price_avg = melb_data %>% 
+  dplyr::group_by(Suburb) %>%
+  dplyr::summarise(Average_Price_Suburb = mean(Price), Count = n()) %>%
+  dplyr::arrange(desc(Average_Price_Suburb))
+
+head(suburb_price_avg)
+```
+
+$~$
+
+##### Mutate
+
+If we want to add a new variable to our dataset that gives the year a
+house was sold, we can do this using a `mutate()` command, which
+extracts the year from the date to perform analysis on.
+
+```{r , echo=TRUE, eval = FALSE}
+melb_data = melb_data %>%
+  dplyr::mutate(Year = format(Date, format = "%Y"))
+
+```
+
+$~$
+
+##### If else
+
+The `if_else()` statement (in the **dplyr** package) works in a similar
+way to if statements in Excel, where it uses a logical statement to
+identify the output. Below we are identifying properties whose price is
+under 1 million, the mutate function is used together with the
+`if_else()` function to add a variable to the Melbourne dataset, where
+
+$$price\_under\_1mill =\begin{cases} 1 & if \ house \ price < 1 \ million \\
+                     0 &   if \ house \ price \geq 1 \ million
+       \end{cases}$$
+
+```{r , echo=TRUE, eval = FALSE}
+melb_data %>%
+  dplyr::mutate(price_under_1mill = if_else(Price < 1000000, 1 , 0)) 
+```
+
+```{r message=FALSE, warning=FALSE, echo=TRUE, eval = FALSE}
+# Save as csv
+write.csv(melb_data, "data/melb_data_edited.csv", row.names = FALSE)
+
+# Save as xlsx
+writexl::write_xlsx(melb_data, "data/melb_data_edited.xlsx")
+
+# Save as Rda
+save(melb_data, file = "data/melb_data_edited.Rda")
+```
+
+$~$
+
+------------------------------------------------------------------------
+
+### Exercises - Module 4
+
+#### 1) Looking at property prices, answer the following questions
+
+-   What is the Region that has sold a property for the highest price?
+
+-   What is the Region that has sold a property for the lowest price?
+
+-   What is the mean and median property price?
+
+```{r}
+
+```
+
+$~$
+
+#### 2) We will now be looking at the price of each square meter of Building and Land.
+
+-   First remove rows with zeros given for Land or Building Area.
+
+-   Then create a new variable that calculates the price of each square
+    meter of Building and Land.
+
+-   Then find the Region with the most and least expensive square meter
+    of Building and Land.
+
+```{r}
+
+```
+
+$~$
+
+#### 3) Drop the following variables:
+
+-   Latitude
+-   Longitude
+-   Postcode
+-   Address
+-   Method
+
+```{r}
+
+```
+
+$~$
+
+#### 4) (Optional) Answer 2 questions on the data where possible using the filter, arrange and group_by() method.
+
+-   What is the average price for a property with 5 rooms overall? 
+
+
+```{r}
+
+  
+```
+
+- What is the average price for a property with 5 rooms by property type?
+
+
+```{r}
+
+```
+
+#### 5) (Optional) Create a new variable in the dataset
+
+- Using the mutate and case_when method, create a new variable in the dataset that will indicate whether properties are in the high (\>1 mil), medium (500k - 1mil) and low (\< 500k) priced buckets. 
+
+- How many properties are in each bucket?
+
+*Tip: Use the group by and summarise functions to help you*
+
