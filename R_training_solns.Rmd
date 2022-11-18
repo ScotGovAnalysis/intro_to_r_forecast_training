@@ -1,0 +1,291 @@
+---
+title: |
+  ![](forecast_logo.png){width=3in}  
+  R Programming for Data Analytics - Solutions to exercises
+author: "Forecast Data Services"
+output: html_document
+date: '2022-11-15'
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Solutions
+
+**This document contains all solutions to the different exercises. You will need to have imported your data and performed any necessary transformations before completing the exercises**
+
+
+### Exercises - Module 3
+
+$~$
+
+#### 1) SellerG appears to be a numeric variable - convert it to a categorical variable
+
+
+```{r}
+melb_data$SellerG = as.factor(melb_data$SellerG)
+```
+
+$~$
+
+#### 2) Rename the column SellerG to Seller.
+
+```{r}
+data.table::setnames(melb_data, "SellerG", "Seller")
+```
+
+$~$
+
+#### 3) Which Seller has sold the most properties overall? 
+
+```{r}
+summary(melb_data$Seller) # Nelson sold the most properties overall (763)
+```
+
+$~$
+
+#### 4) What is the lowest and highest price a property has been sold for?
+
+```{r}
+summary(melb_data$Price) # Min: 131000, Max: 9000000
+```
+
+------------------------------------------------------------------------
+
+### Exercises - Module 4
+
+#### 1) Looking at Property Prices, answer the following questions
+
+-   What is the Region that has sold a property for the highest price? 
+
+```{r}
+# Region with highest price - South Eastern Metropolitan
+melb_data %>% 
+  dplyr::arrange(desc(Price)) %>%
+  dplyr::slice(1)
+```
+
+-   What is the Region that has sold a property for the lowest price? 
+
+```{r}
+# Region with lowest price - Southern Metropolitan
+melb_data %>% 
+  dplyr::arrange(Price) %>%
+  dplyr::slice(1)
+
+# Or to get both highest and lowest priced area
+melb_data %>% 
+  dplyr::arrange(desc(Price)) %>%
+  dplyr::slice(c(1, (n()-1)))
+
+```
+
+-   What is the mean and median property price?
+
+```{r}
+# To get mean and median of a variable
+mean(melb_data$Price)
+median(melb_data$Price)
+```
+
+#### 2) We will now be looking at the price of each square meter of Building and Land. 
+
+- First remove rows with zeros given for Land or Building Area. 
+
+- Then create a new variable that calculates the price of each square meter of Building and Land.
+
+```{r}
+# Remove building and land size of 0
+melb_data_newcols = melb_data %>%
+  dplyr::filter(Landsize != 0,
+         BuildingArea != 0) %>%
+  # Create new variables
+  dplyr::mutate(price_land_area = Price/Landsize,
+         price_building_area = Price/BuildingArea)
+```
+
+
+- Then find the Region with the most and least expensive square meter of Building and Land. 
+
+```{r}
+# Most expensive region by land price is Southern Metropolitan and least expensive is Western Metropolitan
+melb_data_newcols %>% 
+  dplyr::arrange(desc(price_land_area)) %>%
+  dplyr::slice(c(1, (n()-1)))
+
+# Most expensive region by land price is Southern Metropolitan and least expensive is Western Metropolitan
+melb_data_newcols %>% 
+  dplyr::arrange(desc(price_building_area)) %>%
+  dplyr::slice(c(1, (n()-1)))
+```
+
+#### 3) Drop the following variables:
+
+-   Latitude
+-   Longitude
+-   Postcode
+-   Address
+-   Method
+
+```{r}
+melb_data_refined = melb_data_newcols %>%
+  dplyr::select(-c(Lattitude, Longtitude, Postcode, Address, Method))
+```
+
+#### 4) (Optional) Answer 2 questions on the data where possible using the filter, arrange and group_by() method.
+
+-   What is the Average price for a property with 5 rooms overall?
+
+```{r}
+# 1960689
+melb_data_refined %>%
+  dplyr::filter(Rooms == 5) %>%
+  dplyr::group_by(Rooms) %>%
+  dplyr::summarise(Avg_Price = mean(Price))
+
+```
+
+- What is the Average price for a property with 5 rooms by Property type?
+
+```{r}
+# h= 1972224.8 and t= 891666.7
+melb_data_refined %>%
+  dplyr::filter(Rooms == 5) %>%
+  dplyr::group_by(Type) %>%
+  dplyr::summarise(Avg_Price = mean(Price))
+```
+
+#### 5) (Optional) Create a new variable in the dataset
+
+- Using the mutate and case_when method, create a new variable in the dataset that will indicate whether properties are in the high (\>1 mil), medium (500k - 1mil) and low (\< 500k) priced buckets. 
+
+```{r}
+melb_data_cleaned = melb_data %>%
+  dplyr::mutate(Price_band = case_when(
+    Price < 500000  ~ "low",
+    Price < 1000000 & Price >= 500000 ~ "medium",
+    TRUE ~ "high"
+  ))
+```
+
+- How many properties are in each bucket?
+
+*Tip: Use the group by and summarise functions to help you*
+
+```{r}
+melb_data_cleaned %>%
+  dplyr::group_by(Price_band) %>%
+  dplyr::summarise(Count = n())
+```
+
+$~$
+
+------------------------------------------------------------------------
+
+### Exercises - Module 5 
+
+#### 1) Create a histogram using the Melbourne dataset on the distance from city center. Use either base r or ggplot.
+
+```{r}
+hist(x = melb_cleaned_data$Distance)
+```
+
+-   Change the colour (use any colour except the default grey)
+-   (Extra) Add a chart title
+-   (Extra) Add x and y-axis labels
+
+```{r}
+# Using base R
+hist(x = melb_cleaned_data$Distance, 
+     xlab = 'Distance', ylab = 'Counts', 
+     main = 'Histogram of distance from city centre', 
+     col = 'lightblue')
+```
+
+```{r message=FALSE, warning=FALSE}
+# Using ggplot
+ggplot(data = melb_cleaned_data, aes(x = Distance)) +
+  geom_histogram(color = "black", 
+                 fill = "lightblue", na.rm = TRUE) +
+  scale_y_continuous(name = "Counts") +
+  scale_x_continuous(name = "Distance") +
+  ggtitle(label = "Histogram of distance from city centre")
+```
+
+------------------------------------------------------------------------
+
+### Exercises - Module 7
+
+$~$
+
+#### 1) Create a simple function
+
+-   Convert property prices from dollars to pounds. *(Tip: Check the mean price of property prices before and after you use your function to check that it has worked)*
+
+```{r}
+# This function will convert dollars into pounds using a specified rate
+
+convert_dollars_into_pounds <- function(df, variable, rate){
+  # @param df: dataframe with data
+  # @param variable: string to indicate the variable name that must be converted
+  # @param rate: specified rate to apply the conversion from dollars to pounds
+  
+  df['Price_pounds'] = df[variable]*rate
+  
+  return (df)
+}
+```
+
+```{r}
+melb_data_pounds = convert_dollars_into_pounds(
+  df = melb_data, variable = 'Price',
+                            rate = 0.71)
+```
+
+```{r}
+mean(melb_data$Price)
+mean(melb_data_pounds$Price_pounds)
+
+```
+
+$~$
+
+#### 2) Place control flows in your function to prevent function failing or returning a nonsensical answer.
+
+-   Ensure the variable passed into the function exists in the dataset given.
+-   Ensure the rate is within realistic bounds.
+
+```{r}
+# This function will convert dollars into pounds using a specified rate
+
+convert_dollars_into_pounds <- function(df, variable, rate){
+  # @param df: dataframe with data
+  # @param variable: string to indicate the variable name that must be converted
+  # @param rate: specified rate to apply the conversion from dollars to pounds
+  if(rate > 10 | rate < -10){
+    if(variable %in% colnames(df)){
+      df['Price_pounds'] = df[variable]*rate
+     } else {
+        df<-df
+        print(paste0("Price_pounds could not be created. Variable ", variable," does not exist in dataframe ", df, "."))
+    }
+  } else {
+    print(paste0("Price_pounds could not be created. This is outside accepted bounds. Please choose rate between -10 and 10", "Rate provided: ", rate, "."))
+  }
+  
+  
+  return (df)
+}
+```
+
+```{r}
+melb_data_pounds = convert_dollars_into_pounds(
+  df = melb_data, variable = 'Made_Up_Variable',
+                            rate = 0.71)
+```
+
+```{r}
+melb_data_pounds = convert_dollars_into_pounds(
+  df = melb_data, variable = 'Price',
+                            rate = 15)
+```
